@@ -1,0 +1,86 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="panel panel-warning bg-gray-light" style="opacity: 1;">
+      <div class="bg-gray-light">
+        <div class="row">
+          <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+              <h4>Catalogo - Detalhamento</h4>
+            </div>
+            <div class="col-md-12 col-sm-12 col-xs-12">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-12">
+          <div class="panel-body">
+            <form method="get" action="/" class="form-horizontal ng-pristine ng-valid">
+              <fieldset>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">Name</label>
+                  <div class="col-sm-10">
+                    <input type="text" ng-model="vm.object.name" 
+                    class="form-control">
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">Descrição</label>
+                  <div class="col-sm-10">
+                    <textarea type="textarea"  rows="4" class="form-control" ng-model="vm.object.description" >
+                    <!-- <span class="help-block">A block of help text that breaks onto a new line and may extend beyond one
+                      line.</span> -->
+                    </textarea>
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">Tipo Catalogo</label>
+                  <div class="col-sm-10">
+                    <input type="text" ng-model="vm.object.catalog.name" 
+                    class="form-control">
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <div class="form-group">
+                  <label class="col-sm-2 control-label">RA</label>
+                  <div class="col-sm-5">
+                    <input type="text" name="ra" ng-model="vm.object.ra" 
+                    class="form-control">
+                  </div>
+                </div>
+              </fieldset>
+              <fieldset>
+                <div class="form-group" >
+                  <label class="col-sm-2 control-label">DEC</label>
+                  <div class="col-sm-5">
+                    <input type="text"  ng-model="vm.object.dec" 
+                    class="form-control">
+                  </div>
+                </div>
+              </fieldset>
+            </form>
+          </div>
+        </br>   
+        
+      </div>
+      <div class="panel-footer">
+        <button type="submit" class="btn btn-primary" ng-click="vm.voltar()">Voltar</button>
+        <div class="pull-right">
+          <!-- ng-disabled="form.$invalid" -->
+          <button type="submit" ng-click="vm.salvar()"
+            class="btn btn-primary">Salvar</button>
+          <button type="submit" ng-click="vm.exibirImagemAladin()"
+            class="btn btn-primary">Ver Aladin</button>
+            
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

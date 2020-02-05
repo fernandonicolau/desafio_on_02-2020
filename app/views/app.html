@@ -1,0 +1,13 @@
+<!-- top navbar-->
+<header ng-include="'app/views/partials/top-navbar.html'" class="topnavbar-wrapper"></header>
+<!-- sidebar-->
+<aside ng-include="'app/views/partials/sidebar.html'" ng-controller="SidebarController" class="aside"></aside>
+<!-- Main section-->
+<section>
+   <!-- Page content-->
+   <div growl></div>
+   <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-1"></span>
+   <div ui-view="" autoscroll="false" ng-class="app.viewAnimation" class="content-wrapper"></div>
+</section>
+<!-- Page footer-->
+<footer ng-include="'app/views/partials/footer.html'" class=""></footer>

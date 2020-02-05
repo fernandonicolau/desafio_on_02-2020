@@ -1,0 +1,64 @@
+<!-- START Top Navbar-->
+<nav role="navigation" class="navbar topnavbar row-extra">
+  <!-- START navbar header-->
+  <div class="navbar-header">
+    <a href="#/" class="navbar-brand">
+      <div class="brand-logo">
+        <img src="app/img/logo.png" alt="App Logo" class="img-responsive col-md-12" />
+      </div>
+      <div class="brand-logo-collapsed">
+        <img src="app/img/logo-single.png" alt="App Logo" class="img-responsive" />
+      </div>
+    </a>
+  </div>
+  <!-- END navbar header-->
+  <!-- START Nav wrapper-->
+  <div class="nav-wrapper">
+    <!-- START Left navbar-->
+    <!-- START Left collapse button-->
+    <ul class="nav navbar-nav">
+      <li>
+        <!-- Button used to collapse the left sidebar. Only visible on tablet and desktops-->
+        <a href="#" ng-click="app.layout.isCollapsed = !app.layout.isCollapsed" class="hidden-xs">
+           <em class="fa fa-navicon"></em>
+        </a>
+        <!-- Button to show/hide the sidebar on mobile. Visible on mobile only.-->
+        <a href="#" ng-click="app.asideToggled = !app.asideToggled" class="visible-xs sidebar-toggle">
+          <em class="fa fa-navicon"></em>
+        </a>
+      </li>
+    </ul>
+    <!-- END Left collapse button-->
+    <ul class="nav navbar-nav navbar-right" ng-if="currentUser">
+      <!-- START Right user label-->
+      <li ng-if="currentUser.base64">
+        <a href="#" no-persist="no-persist">
+          <img ng-if="currentUser.base64 !== ''" ng-src="{{currentUser.base64}}"
+               class="img-rounded thumb32"/>
+        </a>
+      </li>
+      <li>
+        <a ng-href="" toggle-state="offsidebar-open" no-persist="no-persist">
+          <span style="">OLÁ, {{currentUser.nome}}</span>
+        </a>
+      </li>
+      <!-- END Right user label-->
+      <!-- START Right logout button-->
+      <li>
+        <a ng-href="{{url}}" toggle-state="offsidebar-open" no-persist="no-persist">
+          <em class="fa fa-ban" title="Sair"></em>
+        </a>
+      </li>
+      <li>
+        <a ng-href="{{dashboard}}" toggle-state="offsidebar-open" no-persist="no-persist">
+          <em class="fa fa-mail-reply-all" title="Mudar de módulo"></em>
+        </a>
+      </li>
+      <!-- END Right logout button-->
+    </ul>
+
+    <!-- END Left navbar-->
+  </div>
+  <!-- END Nav wrapper-->
+</nav>
+<!-- END Top Navbar-->

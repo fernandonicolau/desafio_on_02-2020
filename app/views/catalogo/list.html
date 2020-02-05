@@ -1,0 +1,46 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+    <div class="panel panel-warning bg-gray-light" style="opacity: 1;">
+        <div class="bg-gray-light">
+           <div class= "row">
+             <div class="col-md-12 col-sm-12 col-xs-12">
+               <div class="col-md-12 col-sm-12 col-xs-12"><h4>Catalogo - Filtros de pesquisa</h4></div>
+               <div class="col-md-12 col-sm-12 col-xs-12">
+               </div>
+             </div>
+           </div>
+        </div>
+    </div>
+
+     <div class="row">
+      <div class="col-md-12">
+        <!-- FIXME IMPLEMENTAR FILTRO PESQUISA -->
+      </div>
+    </div>
+  </br>
+    <div ui-i18n="'pt-br'">
+        <div ui-grid="vm.gridOpts" ui-grid-resize-columns ui-grid-move-columns ui-grid-pagination class="grid"></div>
+    </div>
+  </div>
+</div>
+
+
+<script type="text/ng-template" id="acoes.html">
+  <div class="ui-grid-cell-contents">
+    <span  ng-click="grid.appScope.vm.editarConteudo(row.entity)" title="Editar">
+        <i class="fa fa-gears" style="margin-right: 15%; margin-left: 10%;"></i>
+  </span>
+    &nbsp;&nbsp;&nbsp;
+  </div>
+</script>
+
+<script type="text/ng-template" id="ver.html">
+  <div class="ui-grid-cell-contents">
+    <i class="fa fa-eye" style="margin-right: 2%;"></i>
+    <span  ng-click="grid.appScope.vm.exibirGalaxia(row.entity)" 
+      style="color: blue;" title="Ver">
+      {{row.entity.name}}
+    </span>
+    &nbsp;&nbsp;&nbsp;
+  </div>
+</script>

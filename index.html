@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" data-ng-app="projetoBase">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="{{app.description}}">
+  <meta name="keywords" content="Projeto Base">
+  <title>DESAFIO - OBSERVATÓRIO NACIONAL</title>
+
+  <!-- Application styles-->
+  <!-- Application styles-->
+  <link rel="stylesheet" href="app/css/style.css">
+  <link rel="stylesheet" href="app/css/app.css">
+  <link rel="stylesheet" href="app/css/growl.css">
+  <link rel="shortcut icon" type="image/x-icon" href="app/favicon.ico" />
+  <script src="app/js/pdfmake.js"></script>
+  <script src="app/js/vfs_fonts.js"></script>
+</head>
+
+<body data-ng-class="{ 'layout-fixed' : app.layout.isFixed, 'aside-collapsed' : app.layout.isCollapsed, 'layout-boxed' : app.layout.isBoxed, 'layout-fs': app.useFullLayout, 'hidden-footer': app.hiddenFooter, 'layout-h': app.layout.horizontal, 'aside-float': app.layout.isFloat, 'offsidebar-open': app.offsidebarOpen, 'aside-toggled': app.asideToggled}">
+  <div data-ui-view="" data-autoscroll="false" class="wrapper"></div>
+  <script src="app/js/base.js"></script>
+  <script src="app/js/spin.js"></script>
+  <script src="app/js/app.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-i18n/1.5.9/angular-locale_pt-br.min.js"></script>
+</body>
+
+</html>
