@@ -18,9 +18,9 @@
           { name: 'Nome', field:'name', cellTemplate: 'ver.html', width: '15%'},
           { name: 'Descrição', field:'description',  width: '30%'},
           { name: 'Tipo Catalogo', field:'catalog.name',  width: '15%'},
-          { name: 'RA', field:'ra',  width: '15%'},
-          { name: 'DEC', field:'dec',  width: '15%'},
-          { name: 'Editar', enableFiltering: false, cellTemplate: 'acoes.html', width: '8%'}
+          { name: 'RA', field:'ra',  width: '13%'},
+          { name: 'DEC', field:'dec',  width: '13%'},
+          { name: 'Editar', enableFiltering: false, cellTemplate: 'acoes.html', width: '12%'}
 
         ],
         enableFiltering: true,

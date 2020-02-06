@@ -5,9 +5,9 @@
     .module('projetoBase')
     .controller('CtrlCatalogoList', CtrlCatalogoList);
 
-  CtrlCatalogoList.$inject = ['$state', 'GridCatalogoList', 'JSON_LISTA_OBJETOS'];
+  CtrlCatalogoList.$inject = ['$state', 'GridCatalogoList', 'SrvAladin', 'SrvCatalogo', 'JSON_LISTA_OBJETOS'];
 
-    function CtrlCatalogoList($state, GridCatalogoList, JSON_LISTA_OBJETOS) {
+    function CtrlCatalogoList($state, GridCatalogoList, SrvAladin, SrvCatalogo, JSON_LISTA_OBJETOS) {
       var vm = this;
 
       var init = () =>{
@@ -15,6 +15,11 @@
 
         // FIXME USAR API PARA CONSUMIR DADOS
         vm.gridOpts.data = JSON_LISTA_OBJETOS.objects;
+        
+        SrvCatalogo.getLista().then(function(result){
+          vm.gridOpts.data = result.objects;
+        });
+
       };
       init();
 
@@ -25,6 +30,14 @@
 
       vm.editarConteudo = (entity) =>{
         window.open(`#/app/views/catalogo/${entity.id}/editar`, '_self');
+      }
+
+      vm.novo = () =>{
+        $state.go('app.catalogo.new');
+      }
+
+      vm.abrirAladin = (entity) =>{
+        SrvAladin.abrirSkyMapAladin(entity);
       }
 
     }

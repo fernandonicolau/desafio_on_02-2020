@@ -21,7 +21,14 @@
     <div ui-i18n="'pt-br'">
         <div ui-grid="vm.gridOpts" ui-grid-resize-columns ui-grid-move-columns ui-grid-pagination class="grid"></div>
     </div>
+    <div class="panel-footer">
+      <div class="pull-right">
+        <button type="submit" class="btn btn-primary" 
+        ng-click="vm.novo()">Novo</button>
+      </div>
+    </div>
   </div>
+  
 </div>
 
 
@@ -30,15 +37,18 @@
     <span  ng-click="grid.appScope.vm.editarConteudo(row.entity)" title="Editar">
         <i class="fa fa-gears" style="margin-right: 15%; margin-left: 10%;"></i>
   </span>
+  <span  ng-click="grid.appScope.vm.abrirAladin(row.entity)" title="Editar">
+    <i class="fa fa-map" style="margin-right: 15%; margin-left: 10%;"></i>
+</span>
     &nbsp;&nbsp;&nbsp;
   </div>
 </script>
 
 <script type="text/ng-template" id="ver.html">
   <div class="ui-grid-cell-contents">
-    <i class="fa fa-eye" style="margin-right: 2%;"></i>
     <span  ng-click="grid.appScope.vm.exibirGalaxia(row.entity)" 
       style="color: blue;" title="Ver">
+      <i class="fa fa-eye" style="margin-right: 2%;"></i>
       {{row.entity.name}}
     </span>
     &nbsp;&nbsp;&nbsp;
