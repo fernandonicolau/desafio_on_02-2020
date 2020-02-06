@@ -19,7 +19,7 @@
     };
 
     function _get(catalog_id){
-      return api.get('catalog/'+catalog_id+'/catalog_objects');
+      return api.get('catalog/'+catalog_id+');
     }
 
     function _getLista(){
