@@ -14,19 +14,19 @@ function CtrlModalObjetos($scope, growl, SrvCatalogo, SrvObjetos, $modalInstance
     vm.object = objetoCatalogo;
 
     vm.salvar = () => {
-        SrvObjetos.salvar(vm.object).then(function (result) {
-            if (true) {
-                growl.success("Catalogo criado com successo");
-            }
-        });
+//        SrvObjetos.salvar(vm.object).then(function (result) {
+//            if (true) {
+//                growl.success("Catalogo criado com successo");
+//            }
+//        });
     }
 
     vm.atualizar = () => {
-        SrvObjetos.atualizar(vm.object).then(function (result) {
-            if (true) {
-                growl.success("Catalogo atualizado com successo");
-            }
-        });
+//        SrvObjetos.atualizar(vm.object).then(function (result) {
+//            if (true) {
+//                growl.success("Catalogo atualizado com successo");
+//            }
+//        });
     }
 
     vm.cancel = () => {

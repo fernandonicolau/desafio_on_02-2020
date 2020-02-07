@@ -61,9 +61,9 @@
           template: 'excluir-objetoCatalogo.html',
           className: 'ngdialog-theme-default custom-width-700'
       }).then(function (value) {
-        SrvObjetos.deletar(objetoCatalogo).then(function (result) {
-            init();
-        });
+        // SrvObjetos.deletar(objetoCatalogo).then(function (result) {
+        //     init();
+        // });
       }, function (reason) {
         
       });

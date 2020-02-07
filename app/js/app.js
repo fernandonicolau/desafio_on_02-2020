@@ -258,60 +258,6 @@ App
     ]
   });
 
-'use strict';
-
-angular.module('projetoBase')
-  .service('$api', ["$http", "$q", "URL_API", function ($http, $q, URL_API) {
-
-    this.base = function (value) {
-      return new Resource(value);
-    }
-
-    function Resource(base) {
-
-      var http = function (method, path, data, paginacao) {
-        var deferred = $q.defer();
-
-        if (method === 'POST' || method === 'PUT') {
-          $http({method: method, data: data, url: URL_API.urlBase + '/' + base + '/' + path})
-            .success(function (data) {
-              deferred.resolve(data);
-            }).error(function (err) {
-              deferred.reject(err);
-            });
-          return deferred.promise;
-        } else {
-          $http({method: method, url: URL_API.urlBase + '/' + base + '/' + path, params: paginacao})
-            .success(function (data) {
-              deferred.resolve(data);
-            }).error(function (err) {
-              deferred.reject(err);
-            });
-          return deferred.promise;
-        }
-
-      }
-
-      this.head = function (path) {
-        return http('HEAD', path === undefined ? '' : path);
-      };
-
-      this.get = function (path, paginacao) {
-        return http('GET', path === undefined ? '' : path, null, paginacao);
-      };
-      this.post = function (path, data) {
-        return http('POST', path === undefined ? '' : path, data || '');
-      };
-      this.delete = function (path) {
-        return http('DELETE', path === undefined ? '' : path );
-      };
-      this.put = function (path, data) {
-        return http('PUT', path === undefined ? '' : path, data || '');
-      }
-    }
-
-  }]);
-
 (function (angular) {
   'use strict';
 
@@ -495,6 +441,60 @@ function ($stateProvider, $urlRouterProvider, helper) {
 
 
 }]);
+
+'use strict';
+
+angular.module('projetoBase')
+  .service('$api', ["$http", "$q", "URL_API", function ($http, $q, URL_API) {
+
+    this.base = function (value) {
+      return new Resource(value);
+    }
+
+    function Resource(base) {
+
+      var http = function (method, path, data, paginacao) {
+        var deferred = $q.defer();
+
+        if (method === 'POST' || method === 'PUT') {
+          $http({method: method, data: data, url: URL_API.urlBase + '/' + base + '/' + path})
+            .success(function (data) {
+              deferred.resolve(data);
+            }).error(function (err) {
+              deferred.reject(err);
+            });
+          return deferred.promise;
+        } else {
+          $http({method: method, url: URL_API.urlBase + '/' + base + '/' + path, params: paginacao})
+            .success(function (data) {
+              deferred.resolve(data);
+            }).error(function (err) {
+              deferred.reject(err);
+            });
+          return deferred.promise;
+        }
+
+      }
+
+      this.head = function (path) {
+        return http('HEAD', path === undefined ? '' : path);
+      };
+
+      this.get = function (path, paginacao) {
+        return http('GET', path === undefined ? '' : path, null, paginacao);
+      };
+      this.post = function (path, data) {
+        return http('POST', path === undefined ? '' : path, data || '');
+      };
+      this.delete = function (path) {
+        return http('DELETE', path === undefined ? '' : path );
+      };
+      this.put = function (path, data) {
+        return http('PUT', path === undefined ? '' : path, data || '');
+      }
+    }
+
+  }]);
 
 'use strict';
 
@@ -1292,9 +1292,9 @@ App.service('Utils', ["$window", "APP_MEDIAQUERY", function($window, APP_MEDIAQU
           template: 'excluir-objetoCatalogo.html',
           className: 'ngdialog-theme-default custom-width-700'
       }).then(function (value) {
-        SrvObjetos.deletar(objetoCatalogo).then(function (result) {
-            init();
-        });
+        // SrvObjetos.deletar(objetoCatalogo).then(function (result) {
+        //     init();
+        // });
       }, function (reason) {
         
       });
@@ -1502,27 +1502,34 @@ function ($stateProvider, $urlRouterProvider, RouteHelpersProvider) {
     var api = $api.base('api');
 
     return{
-      get: _get,
       getLista: _getLista,
+      getListaObjetcs: _getListaObjetcs,
       salvar: _salvar,
       atualizar: _atualizar,
+      deletar: _deletar
     };
 
-    function _get(catalog_id){
-      return api.get('catalog/'+catalog_id+'/catalog_objects');
-    }
-
     function _getLista(){
-      return api.get('catalog_objects');
+      return api.get('catalog');
     }
 
+    function _getListaObjetcs(id_catalog){
+      return api.get('catalog/'+id_catalog+'/catalog_objects');
+    }
+
+    
     function _salvar(entity){
       return api.post('catalog',entity);
     }
 
     function _atualizar(entity){
-      return api.put('catalog',entity);
+      return api.put('catalog/'+entity.id ,entity);
     }
+
+    function _deletar(entity){
+      return api.delete('catalog/'+entity.id);
+    }
+
 
   };
 
@@ -1648,19 +1655,19 @@ function CtrlModalObjetos($scope, growl, SrvCatalogo, SrvObjetos, $modalInstance
     vm.object = objetoCatalogo;
 
     vm.salvar = () => {
-        SrvObjetos.salvar(vm.object).then(function (result) {
-            if (true) {
-                growl.success("Catalogo criado com successo");
-            }
-        });
+//        SrvObjetos.salvar(vm.object).then(function (result) {
+//            if (true) {
+//                growl.success("Catalogo criado com successo");
+//            }
+//        });
     }
 
     vm.atualizar = () => {
-        SrvObjetos.atualizar(vm.object).then(function (result) {
-            if (true) {
-                growl.success("Catalogo atualizado com successo");
-            }
-        });
+//        SrvObjetos.atualizar(vm.object).then(function (result) {
+//            if (true) {
+//                growl.success("Catalogo atualizado com successo");
+//            }
+//        });
     }
 
     vm.cancel = () => {
