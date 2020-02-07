@@ -5,40 +5,63 @@
     .module('projetoBase')
     .controller('CtrlCatalogoList', CtrlCatalogoList);
 
-  CtrlCatalogoList.$inject = ['$state', 'GridCatalogoList', 'SrvAladin', 'SrvCatalogo', 'JSON_LISTA_OBJETOS'];
+  CtrlCatalogoList.$inject = ['$state', 'GridCatalogoList', 'SrvCatalogo', 
+  '$modal', 'ngDialog'];
 
-    function CtrlCatalogoList($state, GridCatalogoList, SrvAladin, SrvCatalogo, JSON_LISTA_OBJETOS) {
+    function CtrlCatalogoList($state, GridCatalogoList, SrvCatalogo, 
+      $modal, ngDialog) {
       var vm = this;
 
       var init = () =>{
         vm.gridOpts = GridCatalogoList.grid();
-
-        // FIXME USAR API PARA CONSUMIR DADOS
-        vm.gridOpts.data = JSON_LISTA_OBJETOS.objects;
-        
         SrvCatalogo.getLista().then(function(result){
           vm.gridOpts.data = result.objects;
         });
-
       };
       init();
 
-
-      vm.exibirGalaxia = (entity) =>{
+      vm.exibirCatalogo = (entity) =>{
         window.open(`#/app/views/catalogo/${entity.id}/exibir`, '_self');
+      }    
+
+      vm.novoCatalogo = (Catalogo) => {
+        vm.modalCatalogo(Catalogo);
       }
 
-      vm.editarConteudo = (entity) =>{
-        window.open(`#/app/views/catalogo/${entity.id}/editar`, '_self');
+      vm.editarCatalogo = (Catalogo) => {
+        vm.modalCatalogo(Catalogo);
       }
 
-      vm.novo = () =>{
-        $state.go('app.catalogo.new');
-      }
+      vm.modalCatalogo = function(catalogo){
+        var modalInstance = $modal.open({
+          templateUrl: 'app/views/catalogo/modal-catalogo.html',
+          controller: 'CtrlModalCatalogo as vm',
+          size: 'md',
+          resolve: {
+            Catalogo: function() {
+              return angular.copy(catalogo);
+            }
+          }
+        });
+        modalInstance.result.then(function(data) {
+          vm.gridOpts.data = [];
+          init();
+        });
+      };
 
-      vm.abrirAladin = (entity) =>{
-        SrvAladin.abrirSkyMapAladin(entity);
+      vm.excluirCatalogo = (catalogo) => {
+        ngDialog.openConfirm({
+          template: 'excluir-catalogo.html',
+          className: 'ngdialog-theme-default custom-width-700'
+      }).then(function (value) {
+        SrvCatalogo.deletar(catalogo).then(function (result) {
+            init();
+        });
+      }, function (reason) {
+        
+      });
       }
+      
 
     }
 })(window.angular);
