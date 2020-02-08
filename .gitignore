@@ -1,4 +1,7 @@
 master/node_modules
+master/node_modules/
 .tmp
 .sass-cache
 master/bower_components
+vendor
+node_modules/
