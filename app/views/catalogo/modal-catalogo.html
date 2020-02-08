@@ -1,0 +1,58 @@
+<div class="modal-header">
+    <button type="button" data-dismiss="modal" aria-hidden="true" class="close" ng-click="vm.cancel()">×</button>
+    <h4 id="myModalLabel" class="modal-title">CRIAR/EDITAR CATALOGO</h4>
+</div>
+
+<div class="modal-body">
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel-body">
+                <!-- ng-if="vm.object || vm.screenMode == 'NEW'" -->
+                <form name="form" 
+                    class="form-horizontal ng-pristine ng-valid">
+                    <fieldset>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Nome</label>
+                            <div class="col-sm-10">
+                                <input type="text" required ng-model="vm.object.name" class="form-control">
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Owner</label>
+                            <div class="col-sm-10">
+                                <input type="text" required ng-model="vm.object.owner" 
+                                class="form-control">
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset ng-if="vm.object.id">
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Data Criação</label>
+                            <div class="col-sm-10">
+                                <label class="form-control">  
+                                    {{vm.object.date | date : "dd/MM/yyyy HH:mm"}}
+                                </label>                            
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            </br>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <button type="submit" class="btn btn-primary" ng-click="vm.cancel()">Voltar</button>
+        <div class="pull-right">
+
+            <button type="submit" ng-click="vm.salvar()" ng-disabled="form.$invalid" ng-if="!vm.object.id"
+                class="btn btn-primary">Salvar</button>
+
+            <button type="submit" ng-click="vm.atualizar()" ng-disabled="form.$invalid" ng-if="vm.object.id"
+                class="btn btn-primary">Atualizar</button>
+
+        </div>
+    </div>
+</div>

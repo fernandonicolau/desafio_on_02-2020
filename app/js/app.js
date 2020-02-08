@@ -496,6 +496,91 @@ function ($stateProvider, $urlRouterProvider, helper) {
 
 }]);
 
+App.controller('SidebarController', ['$rootScope', '$scope', '$state', 'Utils',
+  function($rootScope, $scope, $state, Utils){
+
+    var collapseList = [];
+
+    // demo: when switch from collapse to hover, close all items
+    $rootScope.$watch('app.layout.asideHover', function(oldVal, newVal){
+      if ( newVal === false && oldVal === true) {
+        closeAllBut(-1);
+      }
+    });
+
+    // Check item and children active state
+    var isActive = function(item) {
+
+      if(!item) return;
+
+      if( !item.sref || item.sref == '#') {
+        var foundActive = false;
+        angular.forEach(item.submenu, function(value, key) {
+          if(isActive(value)) foundActive = true;
+        });
+        return foundActive;
+      }
+      else
+        return $state.is(item.sref) || $state.includes(item.sref);
+    };
+
+    $scope.getMenuItemPropClasses = function(item) {
+      return (item.heading ? 'nav-heading' : '') +
+             (isActive(item) ? ' active' : '') ;
+    };
+
+
+    $scope.loadSidebarMenu = function() {
+      menuItems = $state.menuItems;
+     };
+     $scope.loadSidebarMenu();
+
+
+    $scope.addCollapse = function($index, item) {
+      collapseList[$index] = $rootScope.app.layout.asideHover ? true : !isActive(item);
+    };
+
+    $scope.isCollapse = function($index) {
+      return (collapseList[$index]);
+    };
+
+    $scope.toggleCollapse = function($index, isParentItem) {
+
+
+      // collapsed sidebar doesn't toggle drodopwn
+      if( Utils.isSidebarCollapsed() || $rootScope.app.layout.asideHover ) return true;
+
+      // make sure the item index exists
+      if( angular.isDefined( collapseList[$index] ) ) {
+        if ( ! $scope.lastEventFromChild ) {
+          collapseList[$index] = !collapseList[$index];
+          closeAllBut($index);
+        }
+      }
+      else if ( isParentItem ) {
+        closeAllBut(-1);
+      }
+
+      $scope.lastEventFromChild = isChild($index);
+
+      return true;
+
+    };
+
+    function closeAllBut(index) {
+      index += '';
+      for(var i in collapseList) {
+        if(index < 0 || index.indexOf(i) < 0)
+          collapseList[i] = true;
+      }
+    }
+
+    function isChild($index) {
+      return (typeof $index === 'string') && !($index.indexOf('-') < 0);
+    }
+
+}]);
+
 'use strict';
 
 angular.module('projetoBase')
@@ -582,157 +667,6 @@ angular.module('projetoBase')
       }
     };
   }]);
-
-App.controller('SidebarController', ['$rootScope', '$scope', '$state', 'Utils',
-  function($rootScope, $scope, $state, Utils){
-
-    var collapseList = [];
-
-    // demo: when switch from collapse to hover, close all items
-    $rootScope.$watch('app.layout.asideHover', function(oldVal, newVal){
-      if ( newVal === false && oldVal === true) {
-        closeAllBut(-1);
-      }
-    });
-
-    // Check item and children active state
-    var isActive = function(item) {
-
-      if(!item) return;
-
-      if( !item.sref || item.sref == '#') {
-        var foundActive = false;
-        angular.forEach(item.submenu, function(value, key) {
-          if(isActive(value)) foundActive = true;
-        });
-        return foundActive;
-      }
-      else
-        return $state.is(item.sref) || $state.includes(item.sref);
-    };
-
-    $scope.getMenuItemPropClasses = function(item) {
-      return (item.heading ? 'nav-heading' : '') +
-             (isActive(item) ? ' active' : '') ;
-    };
-
-
-    $scope.loadSidebarMenu = function() {
-      menuItems = $state.menuItems;
-     };
-     $scope.loadSidebarMenu();
-
-
-    $scope.addCollapse = function($index, item) {
-      collapseList[$index] = $rootScope.app.layout.asideHover ? true : !isActive(item);
-    };
-
-    $scope.isCollapse = function($index) {
-      return (collapseList[$index]);
-    };
-
-    $scope.toggleCollapse = function($index, isParentItem) {
-
-
-      // collapsed sidebar doesn't toggle drodopwn
-      if( Utils.isSidebarCollapsed() || $rootScope.app.layout.asideHover ) return true;
-
-      // make sure the item index exists
-      if( angular.isDefined( collapseList[$index] ) ) {
-        if ( ! $scope.lastEventFromChild ) {
-          collapseList[$index] = !collapseList[$index];
-          closeAllBut($index);
-        }
-      }
-      else if ( isParentItem ) {
-        closeAllBut(-1);
-      }
-
-      $scope.lastEventFromChild = isChild($index);
-
-      return true;
-
-    };
-
-    function closeAllBut(index) {
-      index += '';
-      for(var i in collapseList) {
-        if(index < 0 || index.indexOf(i) < 0)
-          collapseList[i] = true;
-      }
-    }
-
-    function isChild($index) {
-      return (typeof $index === 'string') && !($index.indexOf('-') < 0);
-    }
-
-}]);
-
-
-/**=========================================================
- * Module: helpers.js
- * Provides helper functions for routes definition
- =========================================================*/
-
-App.provider('RouteHelpers', ['APP_REQUIRES', function (appRequires) {
-  "use strict";
-
-  // Set here the base of the relative path
-  // for all app views
-  this.basepath = function (uri) {
-    return 'app/views/' + uri;
-  };
-
-  // Generates a resolve object by passing script names
-  // previously configured in constant.APP_REQUIRES
-  this.resolveFor = function () {
-    var _args = arguments;
-    return {
-      deps: ['$ocLazyLoad','$q', function ($ocLL, $q) {
-        // Creates a promise chain for each argument
-        var promise = $q.when(1); // empty promise
-        for(var i=0, len=_args.length; i < len; i ++){
-          promise = andThen(_args[i]);
-        }
-        return promise;
-
-        // creates promise to chain dynamically
-        function andThen(_arg) {
-          // also support a function that returns a promise
-          if(typeof _arg == 'function')
-              return promise.then(_arg);
-          else
-              return promise.then(function() {
-                // if is a module, pass the name. If not, pass the array
-                var whatToLoad = getRequired(_arg);
-                // simple error check
-                if(!whatToLoad) return $.error('Route resolve: Bad resource name [' + _arg + ']');
-                // finally, return a promise
-                return $ocLL.load( whatToLoad );
-              });
-        }
-        // check and returns required data
-        // analyze module items with the form [name: '', files: []]
-        // and also simple array of script files (for not angular js)
-        function getRequired(name) {
-          if (appRequires.modules)
-              for(var m in appRequires.modules)
-                  if(appRequires.modules[m].name && appRequires.modules[m].name === name)
-                      return appRequires.modules[m];
-          return appRequires.scripts && appRequires.scripts[name];
-        }
-
-      }]};
-  }; // resolveFor
-
-  // not necessary, only used in config block for routes
-  this.$get = function(){
-    return {
-      basepath: this.basepath
-    }
-  };
-
-}]);
 
 App.directive('dsDate', ['$filter', function($filter) {
   'use strict';
@@ -1033,6 +967,72 @@ App.directive('scrollable', function(){
     }
   };
 });
+
+/**=========================================================
+ * Module: helpers.js
+ * Provides helper functions for routes definition
+ =========================================================*/
+
+App.provider('RouteHelpers', ['APP_REQUIRES', function (appRequires) {
+  "use strict";
+
+  // Set here the base of the relative path
+  // for all app views
+  this.basepath = function (uri) {
+    return 'app/views/' + uri;
+  };
+
+  // Generates a resolve object by passing script names
+  // previously configured in constant.APP_REQUIRES
+  this.resolveFor = function () {
+    var _args = arguments;
+    return {
+      deps: ['$ocLazyLoad','$q', function ($ocLL, $q) {
+        // Creates a promise chain for each argument
+        var promise = $q.when(1); // empty promise
+        for(var i=0, len=_args.length; i < len; i ++){
+          promise = andThen(_args[i]);
+        }
+        return promise;
+
+        // creates promise to chain dynamically
+        function andThen(_arg) {
+          // also support a function that returns a promise
+          if(typeof _arg == 'function')
+              return promise.then(_arg);
+          else
+              return promise.then(function() {
+                // if is a module, pass the name. If not, pass the array
+                var whatToLoad = getRequired(_arg);
+                // simple error check
+                if(!whatToLoad) return $.error('Route resolve: Bad resource name [' + _arg + ']');
+                // finally, return a promise
+                return $ocLL.load( whatToLoad );
+              });
+        }
+        // check and returns required data
+        // analyze module items with the form [name: '', files: []]
+        // and also simple array of script files (for not angular js)
+        function getRequired(name) {
+          if (appRequires.modules)
+              for(var m in appRequires.modules)
+                  if(appRequires.modules[m].name && appRequires.modules[m].name === name)
+                      return appRequires.modules[m];
+          return appRequires.scripts && appRequires.scripts[name];
+        }
+
+      }]};
+  }; // resolveFor
+
+  // not necessary, only used in config block for routes
+  this.$get = function(){
+    return {
+      basepath: this.basepath
+    }
+  };
+
+}]);
+
 App
   .constant('JSON_LISTA_OBJETOS', {
 	"objects": [{
@@ -1064,6 +1064,38 @@ App
 	"total_pages": 1,
 	"num_results": 2
 });
+(function(angular){
+    'user strict'
+  
+    angular
+    .module('projetoBase')
+    .factory('SrvAladin', SrvAladin);
+    
+    function SrvAladin(){
+    
+      return{
+        abrirSkyMapAladin: _abrirSkyMapAladin,
+      };
+  
+      function _abrirSkyMapAladin(posicao){
+            let outHtml = '<link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />'+
+            '<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>'+
+            '<div id="aladin-lite-div" style="width:700px;height:400px;"></div>'+
+            '<script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>'+
+            '<script type="text/javascript">'+
+            '    var aladin = A.aladin("#aladin-lite-div",'+
+            '       {fov: 1.5, reticleSize: 64 }'+
+            '    );'+
+            '    aladin.gotoRaDec('+posicao.ra+', '+posicao.dec+');'+
+            '</script>';       
+              var myWindow = window.open("", "MsgWindow", "width=700,height=400");
+              myWindow.document.write(outHtml);
+      }
+  
+    };
+  
+  })(window.angular);
+  
 /**=========================================================
  * Module: popover.js
  * Utility library to use across the theme
@@ -1205,38 +1237,72 @@ App.service('Utils', ["$window", "APP_MEDIAQUERY", function($window, APP_MEDIAQU
     .module('projetoBase')
     .controller('CtrlCatalogoDetail', CtrlCatalogoDetail);
 
-    CtrlCatalogoDetail.$inject = ['$scope', '$state', '$stateParams', 'JSON_LISTA_OBJETOS'];
+    CtrlCatalogoDetail.$inject = ['$scope', '$state', '$stateParams', 'GridObjetos',
+    'growl', 'SrvCatalogo', 'SrvObjetos', 'ngDialog', 'SrvAladin', '$modal'];
 
-  function CtrlCatalogoDetail($scope, $state, $stateParams, JSON_LISTA_OBJETOS) {
+  function CtrlCatalogoDetail($scope, $state, $stateParams, GridObjetos,
+    growl, SrvCatalogo, SrvObjetos, ngDialog, SrvAladin, $modal) {
 
     var vm = this;
-    $scope.A = {};
+    vm.gridOpts = GridObjetos.grid();
+
+    var init = () => {
+      SrvObjetos.get($stateParams.objectId).then(function(result){
+        if (result) {
+          vm.object = result;
+          SrvCatalogo.getListaObjetcs(vm.object.id).then(function(result){
+            vm.gridOpts.data = result.objects;
+          });
+        }
+      });
+    };
+    init();
+
+    vm.editarObjeto = (objeto) => {
+      vm.modalObjetos(objeto);
+    }
+
+    vm.exibirObjeto = (objeto) => {
+      vm.modalObjetos(objeto);
+    }
     
-    // FIMEX USAR API PARA CONSUMIR DADOS
-    console.log($state.current.screenMode);
-    console.log($stateParams.objectId-1);    
-    vm.object = JSON_LISTA_OBJETOS.objects[$stateParams.objectId-1];
-    
+    vm.modalObjetos = function(objetoCatalogo){
+      var modalInstance = $modal.open({
+        templateUrl: 'app/views/objetos/modal-objeto.html',
+        controller: 'CtrlModalObjetos as vm',
+        size: 'md',
+        resolve: {
+          objetoCatalogo: function() {
+            return angular.copy(objetoCatalogo);
+          }
+        }
+      });
+      modalInstance.result.then(function(data) {
+        vm.gridOpts.data = [];
+        init();
+      });
+    };
+
+    vm.abrirAladin = (entity) => {
+      SrvAladin.abrirSkyMapAladin(entity);
+    }
+
+    vm.deletarObjeto = (objetoCatalogo) => {
+      ngDialog.openConfirm({
+          template: 'excluir-objetoCatalogo.html',
+          className: 'ngdialog-theme-default custom-width-700'
+      }).then(function (value) {
+        // SrvObjetos.deletar(objetoCatalogo).then(function (result) {
+        //     init();
+        // });
+      }, function (reason) {
+        
+      });
+  }
+
     vm.voltar = () => {
       $state.go('app.catalogo.list');
     }
-
-    vm.exibirImagemAladin = () => {
-      let outHtml = '<link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />'+
-      '<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>'+
-      '<div id="aladin-lite-div" style="width:700px;height:400px;"></div>'+
-      '<script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>'+
-      '<script type="text/javascript">'+
-      '    var aladin = A.aladin("#aladin-lite-div",'+
-      '       {fov: 1.5, reticleSize: 64 }'+
-      '    );'+
-      '    aladin.gotoRaDec('+vm.object.ra+', '+vm.object.dec+');'+
-      '</script>';       
-        var myWindow = window.open("", "MsgWindow", "width=700,height=400");
-        myWindow.document.write(outHtml);
-    }
-
-    //  var aladin = A.aladin('#aladin-lite-div');
 
   }
 
@@ -1249,27 +1315,63 @@ App.service('Utils', ["$window", "APP_MEDIAQUERY", function($window, APP_MEDIAQU
     .module('projetoBase')
     .controller('CtrlCatalogoList', CtrlCatalogoList);
 
-  CtrlCatalogoList.$inject = ['$state', 'GridCatalogoList', 'JSON_LISTA_OBJETOS'];
+  CtrlCatalogoList.$inject = ['$state', 'GridCatalogoList', 'SrvCatalogo', 
+  '$modal', 'ngDialog'];
 
-    function CtrlCatalogoList($state, GridCatalogoList, JSON_LISTA_OBJETOS) {
+    function CtrlCatalogoList($state, GridCatalogoList, SrvCatalogo, 
+      $modal, ngDialog) {
       var vm = this;
 
       var init = () =>{
         vm.gridOpts = GridCatalogoList.grid();
-
-        // FIXME USAR API PARA CONSUMIR DADOS
-        vm.gridOpts.data = JSON_LISTA_OBJETOS.objects;
+        SrvCatalogo.getLista().then(function(result){
+          vm.gridOpts.data = result.objects;
+        });
       };
       init();
 
-
-      vm.exibirGalaxia = (entity) =>{
+      vm.exibirCatalogo = (entity) =>{
         window.open(`#/app/views/catalogo/${entity.id}/exibir`, '_self');
+      }    
+
+      vm.novoCatalogo = (Catalogo) => {
+        vm.modalCatalogo(Catalogo);
       }
 
-      vm.editarConteudo = (entity) =>{
-        window.open(`#/app/views/catalogo/${entity.id}/editar`, '_self');
+      vm.editarCatalogo = (Catalogo) => {
+        vm.modalCatalogo(Catalogo);
       }
+
+      vm.modalCatalogo = function(catalogo){
+        var modalInstance = $modal.open({
+          templateUrl: 'app/views/catalogo/modal-catalogo.html',
+          controller: 'CtrlModalCatalogo as vm',
+          size: 'md',
+          resolve: {
+            Catalogo: function() {
+              return angular.copy(catalogo);
+            }
+          }
+        });
+        modalInstance.result.then(function(data) {
+          vm.gridOpts.data = [];
+          init();
+        });
+      };
+
+      vm.excluirCatalogo = (catalogo) => {
+        ngDialog.openConfirm({
+          template: 'excluir-catalogo.html',
+          className: 'ngdialog-theme-default custom-width-700'
+      }).then(function (value) {
+        SrvCatalogo.deletar(catalogo).then(function (result) {
+            init();
+        });
+      }, function (reason) {
+        
+      });
+      }
+      
 
     }
 })(window.angular);
@@ -1288,16 +1390,11 @@ App.service('Utils', ["$window", "APP_MEDIAQUERY", function($window, APP_MEDIAQU
         paginationPageSizes: [10, 50, 75],
         paginationPageSize: 10,
         enableSorting: true,
-        // useExternalPagination: true,
         columnDefs: [
-          //{ name: 'Nome', field:'name',  width: '15%'},
-          { name: 'Nome', field:'name', cellTemplate: 'ver.html', width: '15%'},
-          { name: 'Descrição', field:'description',  width: '30%'},
-          { name: 'Tipo Catalogo', field:'catalog.name',  width: '15%'},
-          { name: 'RA', field:'ra',  width: '15%'},
-          { name: 'DEC', field:'dec',  width: '15%'},
-          { name: 'Editar', enableFiltering: false, cellTemplate: 'acoes.html', width: '8%'}
-
+          { name: 'Nome', field:'name', cellTemplate: 'ver.html', width: '30%'},
+          { name: 'Owner', field:'owner',  width: '40%'},
+          { name: 'Data', field:'date', cellTemplate: 'dataFormatada.html',  width: '20%'},
+          { name: 'Ações', enableFiltering: false, cellTemplate: 'acoes.html', width: '12%'}
         ],
         enableFiltering: true,
         enableColumnResizing: true,
@@ -1306,7 +1403,7 @@ App.service('Utils', ["$window", "APP_MEDIAQUERY", function($window, APP_MEDIAQU
         exporterPdfDefaultStyle: {fontSize: 8},
         exporterPdfTableStyle: {margin: [30, 30, 30, 30]},
         exporterPdfTableHeaderStyle: {fontSize: 10, bold: true, italics: true},
-        exporterPdfHeader: { text: "Catalogo Galaxias", style: 'headerStyle' },
+        exporterPdfHeader: { text: "Grid de Catalogo", style: 'headerStyle' },
         exporterPdfFooter: function ( currentPage, pageCount ) {
           return { text: currentPage.toString() + ' of ' + pageCount.toString(), style: 'footerStyle' };
         },
@@ -1398,27 +1495,286 @@ function ($stateProvider, $urlRouterProvider, RouteHelpersProvider) {
   .module('projetoBase')
   .factory('SrvCatalogo', SrvCatalogo);
 
-  SrvCatalogo.$inject = [ '$api'];
+  SrvCatalogo.$inject = ['$api'];
 
   function SrvCatalogo($api){
 
-    var api = $api.base('api/catalog');
+    var api = $api.base('api');
+
+    return{
+      getLista: _getLista,
+      getListaObjetcs: _getListaObjetcs,
+      salvar: _salvar,
+      atualizar: _atualizar,
+      deletar: _deletar
+    };
+
+    function _getLista(){
+      return api.get('catalog');
+    }
+
+    function _getListaObjetcs(id_catalog){
+      return api.get('catalog/'+id_catalog+'/catalog_objects');
+    }
+
+    
+    function _salvar(entity){
+      return api.post('catalog',entity);
+    }
+
+    function _atualizar(entity){
+      return api.put('catalog/'+entity.id ,entity);
+    }
+
+    function _deletar(entity){
+      return api.delete('catalog/'+entity.id);
+    }
+
+
+  };
+
+})(window.angular);
+
+(function(angular){
+  'user strict'
+
+  angular
+  .module('projetoBase')
+  .factory('SrvCatalogo', SrvCatalogo);
+
+  SrvCatalogo.$inject = ['$api'];
+
+  function SrvCatalogo($api){
+
+    var api = $api.base('api');
+
+    return{
+      getLista: _getLista,
+      getListaObjetcs: _getListaObjetcs,
+      salvar: _salvar,
+      atualizar: _atualizar,
+      deletar: _deletar
+    };
+
+    function _getLista(){
+      return api.get('catalog');
+    }
+
+    function _getListaObjetcs(id_catalog){
+      return api.get('catalog/'+id_catalog+'/catalog_objects');
+    }
+
+    
+    function _salvar(entity){
+      return api.post('catalog',entity);
+    }
+
+    function _atualizar(entity){
+      return api.put('catalog/'+entity.id ,entity);
+    }
+
+    function _deletar(entity){
+      return api.delete('catalog/'+entity.id);
+    }
+
+
+  };
+
+})(window.angular);
+
+(function(angular) {
+  'use strict';
+
+  angular
+    .module('projetoBase')
+    .factory('GridObjetos', GridObjetos);
+
+  function GridObjetos() {
+
+    function _grid() {
+      var optionsGrid = {
+        paginationPageSizes: [10, 50, 75],
+        paginationPageSize: 10,
+        enableSorting: true,
+        columnDefs: [
+          { name: 'Nome', field:'name', cellTemplate: 'ver.html', width: '15%'},
+          { name: 'Descrição', field:'description',  width: '30%'},
+          { name: 'Tipo Catalogo', field:'catalog.name',  width: '15%'},
+          { name: 'RA', field:'ra',  width: '13%'},
+          { name: 'DEC', field:'dec',  width: '13%'},
+          { name: 'Ações', enableFiltering: false, cellTemplate: 'acoes.html', width: '12%'}
+
+        ],
+        enableFiltering: true,
+        enableColumnResizing: true,
+        enableGridMenu: true,
+        enableSelectAll: true,
+        exporterPdfDefaultStyle: {fontSize: 8},
+        exporterPdfTableStyle: {margin: [30, 30, 30, 30]},
+        exporterPdfTableHeaderStyle: {fontSize: 10, bold: true, italics: true},
+        exporterPdfHeader: { text: "Grid de Objetos", style: 'headerStyle' },
+        exporterPdfFooter: function ( currentPage, pageCount ) {
+          return { text: currentPage.toString() + ' of ' + pageCount.toString(), style: 'footerStyle' };
+        },
+        exporterPdfCustomFormatter: function ( docDefinition ) {
+          docDefinition.styles.headerStyle = { fontSize: 22, bold: true };
+          docDefinition.styles.footerStyle = { fontSize: 8, bold: true };
+          return docDefinition;
+        },
+        exporterPdfOrientation: 'landscape',
+        exporterPdfPageSize: 'LETTER',
+        exporterPdfMaxGridWidth: 600
+      }
+
+      return optionsGrid;
+
+    }
+
+    return {
+      grid: _grid
+    };
+
+
+  }
+
+})(window.angular);
+
+(function (angular) {
+        'use strict';
+
+angular
+    .module('projetoBase')
+    .controller('CtrlModalObjetos', CtrlModalObjetos);
+
+CtrlModalObjetos.$inject = ['$scope', 'growl', 'SrvCatalogo', 'SrvObjetos', '$modalInstance', 'objetoCatalogo'];
+
+function CtrlModalObjetos($scope, growl, SrvCatalogo, SrvObjetos, $modalInstance, objetoCatalogo) {
+    
+    var vm = this;
+
+    vm.object = objetoCatalogo;
+
+    vm.salvar = () => {
+//        SrvObjetos.salvar(vm.object).then(function (result) {
+//            if (true) {
+//                growl.success("Catalogo criado com successo");
+//            }
+//        });
+    }
+
+    vm.atualizar = () => {
+//        SrvObjetos.atualizar(vm.object).then(function (result) {
+//            if (true) {
+//                growl.success("Catalogo atualizado com successo");
+//            }
+//        });
+    }
+
+    vm.cancel = () => {
+        $modalInstance.dismiss('cancel');
+    };
+
+}
+})(window.angular);
+(function(angular){
+  'user strict'
+
+  angular
+  .module('projetoBase')
+  .factory('SrvObjetos', SrvObjetos);
+
+  SrvObjetos.$inject = ['$api'];
+
+  function SrvObjetos($api){
+
+    var api = $api.base('api');
 
     return{
       get: _get,
+      salvar: _salvar,
+      atualizar: _atualizar,
+      deletar: _deletar
     };
 
-    function _get(){
-      return api.get('');
+    function _get(catalog_id){
+      return api.get('catalog/'+catalog_id);
+    }
+
+    function _salvar(entity){
+      return api.post('catalog',entity);
+    }
+
+    function _atualizar(entity){
+      return api.put('catalog',entity);
+    }
+
+    function _deletar(entity){
+      return api.delete('catalog/'+entity.id);
     }
 
   };
 
 })(window.angular);
 
+(function (angular) {
+    'use strict';
+
+angular
+.module('projetoBase')
+.controller('CtrlModalCatalogo', CtrlModalCatalogo);
+
+CtrlModalCatalogo.$inject = ['$scope', 'growl', 'SrvCatalogo', '$modalInstance', 'Catalogo'];
+
+function CtrlModalCatalogo($scope, growl, SrvCatalogo, $modalInstance, Catalogo) {
+
+var vm = this;
+
+vm.object = Catalogo;
+
+vm.salvar = () => {
+    vm.object.date = vm.getDateFormatada();
+    SrvCatalogo.salvar(vm.object).then(function (result) {
+        if (true) {
+            growl.success("Catalogo criado com successo");
+            $modalInstance.close();
+        }
+    });
+}
+
+vm.atualizar = () => {
+    SrvCatalogo.atualizar(vm.object).then(function (result) {
+        if (true) {
+            growl.success("Catalogo atualizado com successo");
+            $modalInstance.close();
+        }
+    });
+}
+
+vm.cancel = () => {
+    $modalInstance.dismiss('cancel');
+};
+
+vm.getDateFormatada = () =>{
+    var date = new Date();
+    var dateFormatada = 
+    date.getFullYear() + "-" +
+    (date.getMonth() < 10 ? "0" : "") +
+    date.getMonth() + "-" +
+    (date.getDate() < 10 ? "0" : "") +
+    date.getDate() + "T" +
+    date.getHours() + ":" +
+    date.getMinutes() + ":000000";
+    return dateFormatada;
+}
+
+}
+})(window.angular);
 angular.module("projetoBase")
 .constant("URL_API",
   {
-    "urlBase":"localhost:5000"
+    "urlBase":"http://lna.linea.gov.br"
   }
 );
+
+// http://lna.linea.gov.br
+// localhost:5000

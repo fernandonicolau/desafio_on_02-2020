@@ -1,6 +1,9 @@
 angular.module("projetoBase")
 .constant("URL_API",
   {
-    "urlBase":"localhost:5000"
+    "urlBase":"http://lna.linea.gov.br"
   }
 );
+
+// http://lna.linea.gov.br
+// localhost:5000

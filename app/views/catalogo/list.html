@@ -4,7 +4,7 @@
         <div class="bg-gray-light">
            <div class= "row">
              <div class="col-md-12 col-sm-12 col-xs-12">
-               <div class="col-md-12 col-sm-12 col-xs-12"><h4>Catalogo - Filtros de pesquisa</h4></div>
+               <div class="col-md-12 col-sm-12 col-xs-12"><h4>Catálogo - Filtros de pesquisa</h4></div>
                <div class="col-md-12 col-sm-12 col-xs-12">
                </div>
              </div>
@@ -21,26 +21,64 @@
     <div ui-i18n="'pt-br'">
         <div ui-grid="vm.gridOpts" ui-grid-resize-columns ui-grid-move-columns ui-grid-pagination class="grid"></div>
     </div>
+    <div class="panel-footer">
+      <div class="pull-right">
+        <button type="submit" class="btn btn-primary" 
+        ng-click="vm.novoCatalogo()">Novo</button>
+      </div>
+    </div>
   </div>
+  
 </div>
-
-
-<script type="text/ng-template" id="acoes.html">
-  <div class="ui-grid-cell-contents">
-    <span  ng-click="grid.appScope.vm.editarConteudo(row.entity)" title="Editar">
-        <i class="fa fa-gears" style="margin-right: 15%; margin-left: 10%;"></i>
-  </span>
-    &nbsp;&nbsp;&nbsp;
-  </div>
-</script>
 
 <script type="text/ng-template" id="ver.html">
   <div class="ui-grid-cell-contents">
-    <i class="fa fa-eye" style="margin-right: 2%;"></i>
-    <span  ng-click="grid.appScope.vm.exibirGalaxia(row.entity)" 
+    <span  ng-click="grid.appScope.vm.exibirCatalogo(row.entity)" 
       style="color: blue;" title="Ver">
+      <i class="fa fa-eye" style="margin-right: 2%;"></i>
       {{row.entity.name}}
     </span>
     &nbsp;&nbsp;&nbsp;
   </div>
 </script>
+
+
+<script type="text/ng-template" id="dataFormatada.html">
+  <div class="ui-grid-cell-contents">
+    <span>  
+     {{row.entity.date | date : "dd/MM/yyyy HH:mm"}}
+    </span>
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="acoes.html">
+  <div class="ui-grid-cell-contents">
+
+<span  ng-click="grid.appScope.vm.editarCatalogo(row.entity)" title="Editar">
+  <i class="fa fa-gears" style="margin-right: 5%; margin-left: 5%;"></i>
+</span>
+<span  ng-click="grid.appScope.vm.excluirCatalogo(row.entity)" title="Editar">
+  <i class="fa fa-trash" style="margin-right: 5%; margin-left: 5%;"></i>
+</span>
+    &nbsp;&nbsp;&nbsp;
+  </div>
+</script>
+
+
+<script type="text/ng-template" id="excluir-catalogo.html">
+  <!-- <h2>Native Angular.js solution</h2> -->
+  <p>REMOVER CATALOGO
+     <!-- <code>{{assunto.id}}</code> -->
+  </p>
+  <p class="mt">Deseja
+     <code>REMOVER</code>o catalogo ?</p>
+  <p class="mt"><code>IMPORTANTE! - Isso resultara em EXCLUSÃO de dados referente a esse objeto</code></p>
+  <div class="text-center">
+      <button type="button" ng-click="confirm(true)" class="btn btn-labeled btn-success">
+        <span class="btn-label"><i class="fa fa-thumbs-up"></i>
+        </span>Confirmar</button>
+      <button type="button" ng-click="closeThisDialog('button')" class="btn btn-default">Cancelar</button>
+      <!-- <button type="button" ng-click="closeThisDialog(0)" class="btn btn-info btn-large">Ok, Got It!</button> -->
+  </div>
+  </script>

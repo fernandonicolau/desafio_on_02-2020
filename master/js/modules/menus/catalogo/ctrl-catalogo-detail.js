@@ -6,38 +6,72 @@
     .module('projetoBase')
     .controller('CtrlCatalogoDetail', CtrlCatalogoDetail);
 
-    CtrlCatalogoDetail.$inject = ['$scope', '$state', '$stateParams', 'JSON_LISTA_OBJETOS'];
+    CtrlCatalogoDetail.$inject = ['$scope', '$state', '$stateParams', 'GridObjetos',
+    'growl', 'SrvCatalogo', 'SrvObjetos', 'ngDialog', 'SrvAladin', '$modal'];
 
-  function CtrlCatalogoDetail($scope, $state, $stateParams, JSON_LISTA_OBJETOS) {
+  function CtrlCatalogoDetail($scope, $state, $stateParams, GridObjetos,
+    growl, SrvCatalogo, SrvObjetos, ngDialog, SrvAladin, $modal) {
 
     var vm = this;
-    $scope.A = {};
+    vm.gridOpts = GridObjetos.grid();
+
+    var init = () => {
+      SrvObjetos.get($stateParams.objectId).then(function(result){
+        if (result) {
+          vm.object = result;
+          SrvCatalogo.getListaObjetcs(vm.object.id).then(function(result){
+            vm.gridOpts.data = result.objects;
+          });
+        }
+      });
+    };
+    init();
+
+    vm.editarObjeto = (objeto) => {
+      vm.modalObjetos(objeto);
+    }
+
+    vm.exibirObjeto = (objeto) => {
+      vm.modalObjetos(objeto);
+    }
     
-    // FIMEX USAR API PARA CONSUMIR DADOS
-    console.log($state.current.screenMode);
-    console.log($stateParams.objectId-1);    
-    vm.object = JSON_LISTA_OBJETOS.objects[$stateParams.objectId-1];
-    
+    vm.modalObjetos = function(objetoCatalogo){
+      var modalInstance = $modal.open({
+        templateUrl: 'app/views/objetos/modal-objeto.html',
+        controller: 'CtrlModalObjetos as vm',
+        size: 'md',
+        resolve: {
+          objetoCatalogo: function() {
+            return angular.copy(objetoCatalogo);
+          }
+        }
+      });
+      modalInstance.result.then(function(data) {
+        vm.gridOpts.data = [];
+        init();
+      });
+    };
+
+    vm.abrirAladin = (entity) => {
+      SrvAladin.abrirSkyMapAladin(entity);
+    }
+
+    vm.deletarObjeto = (objetoCatalogo) => {
+      ngDialog.openConfirm({
+          template: 'excluir-objetoCatalogo.html',
+          className: 'ngdialog-theme-default custom-width-700'
+      }).then(function (value) {
+        // SrvObjetos.deletar(objetoCatalogo).then(function (result) {
+        //     init();
+        // });
+      }, function (reason) {
+        
+      });
+  }
+
     vm.voltar = () => {
       $state.go('app.catalogo.list');
     }
-
-    vm.exibirImagemAladin = () => {
-      let outHtml = '<link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />'+
-      '<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>'+
-      '<div id="aladin-lite-div" style="width:700px;height:400px;"></div>'+
-      '<script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>'+
-      '<script type="text/javascript">'+
-      '    var aladin = A.aladin("#aladin-lite-div",'+
-      '       {fov: 1.5, reticleSize: 64 }'+
-      '    );'+
-      '    aladin.gotoRaDec('+vm.object.ra+', '+vm.object.dec+');'+
-      '</script>';       
-        var myWindow = window.open("", "MsgWindow", "width=700,height=400");
-        myWindow.document.write(outHtml);
-    }
-
-    //  var aladin = A.aladin('#aladin-lite-div');
 
   }
 
