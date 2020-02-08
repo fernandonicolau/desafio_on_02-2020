@@ -54,7 +54,9 @@ localhost:<port>
 
 ## Versioning
 
-samos [SemVer] (http://semver.org/) para versionar.
+[SemVer] (http://semver.org/) para versionar.
+
+[standard-version] (https://github.com/conventional-changelog/standard-version) para criar [**CHANGELOG.md**](https://github.com/fernandonicolau/desafio_on_02-2020/blob/master/CHANGELOG.md).
 
 ## Authors
 
