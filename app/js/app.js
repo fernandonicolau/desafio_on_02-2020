@@ -258,6 +258,60 @@ App
     ]
   });
 
+'use strict';
+
+angular.module('projetoBase')
+  .service('$api', ["$http", "$q", "URL_API", function ($http, $q, URL_API) {
+
+    this.base = function (value) {
+      return new Resource(value);
+    }
+
+    function Resource(base) {
+
+      var http = function (method, path, data, paginacao) {
+        var deferred = $q.defer();
+
+        if (method === 'POST' || method === 'PUT') {
+          $http({method: method, data: data, url: URL_API.urlBase + '/' + base + '/' + path})
+            .success(function (data) {
+              deferred.resolve(data);
+            }).error(function (err) {
+              deferred.reject(err);
+            });
+          return deferred.promise;
+        } else {
+          $http({method: method, url: URL_API.urlBase + '/' + base + '/' + path, params: paginacao})
+            .success(function (data) {
+              deferred.resolve(data);
+            }).error(function (err) {
+              deferred.reject(err);
+            });
+          return deferred.promise;
+        }
+
+      }
+
+      this.head = function (path) {
+        return http('HEAD', path === undefined ? '' : path);
+      };
+
+      this.get = function (path, paginacao) {
+        return http('GET', path === undefined ? '' : path, null, paginacao);
+      };
+      this.post = function (path, data) {
+        return http('POST', path === undefined ? '' : path, data || '');
+      };
+      this.delete = function (path) {
+        return http('DELETE', path === undefined ? '' : path );
+      };
+      this.put = function (path, data) {
+        return http('PUT', path === undefined ? '' : path, data || '');
+      }
+    }
+
+  }]);
+
 (function (angular) {
   'use strict';
 
@@ -442,59 +496,90 @@ function ($stateProvider, $urlRouterProvider, helper) {
 
 }]);
 
-'use strict';
+App.controller('SidebarController', ['$rootScope', '$scope', '$state', 'Utils',
+  function($rootScope, $scope, $state, Utils){
 
-angular.module('projetoBase')
-  .service('$api', ["$http", "$q", "URL_API", function ($http, $q, URL_API) {
+    var collapseList = [];
 
-    this.base = function (value) {
-      return new Resource(value);
-    }
+    // demo: when switch from collapse to hover, close all items
+    $rootScope.$watch('app.layout.asideHover', function(oldVal, newVal){
+      if ( newVal === false && oldVal === true) {
+        closeAllBut(-1);
+      }
+    });
 
-    function Resource(base) {
+    // Check item and children active state
+    var isActive = function(item) {
 
-      var http = function (method, path, data, paginacao) {
-        var deferred = $q.defer();
+      if(!item) return;
 
-        if (method === 'POST' || method === 'PUT') {
-          $http({method: method, data: data, url: URL_API.urlBase + '/' + base + '/' + path})
-            .success(function (data) {
-              deferred.resolve(data);
-            }).error(function (err) {
-              deferred.reject(err);
-            });
-          return deferred.promise;
-        } else {
-          $http({method: method, url: URL_API.urlBase + '/' + base + '/' + path, params: paginacao})
-            .success(function (data) {
-              deferred.resolve(data);
-            }).error(function (err) {
-              deferred.reject(err);
-            });
-          return deferred.promise;
+      if( !item.sref || item.sref == '#') {
+        var foundActive = false;
+        angular.forEach(item.submenu, function(value, key) {
+          if(isActive(value)) foundActive = true;
+        });
+        return foundActive;
+      }
+      else
+        return $state.is(item.sref) || $state.includes(item.sref);
+    };
+
+    $scope.getMenuItemPropClasses = function(item) {
+      return (item.heading ? 'nav-heading' : '') +
+             (isActive(item) ? ' active' : '') ;
+    };
+
+
+    $scope.loadSidebarMenu = function() {
+      menuItems = $state.menuItems;
+     };
+     $scope.loadSidebarMenu();
+
+
+    $scope.addCollapse = function($index, item) {
+      collapseList[$index] = $rootScope.app.layout.asideHover ? true : !isActive(item);
+    };
+
+    $scope.isCollapse = function($index) {
+      return (collapseList[$index]);
+    };
+
+    $scope.toggleCollapse = function($index, isParentItem) {
+
+
+      // collapsed sidebar doesn't toggle drodopwn
+      if( Utils.isSidebarCollapsed() || $rootScope.app.layout.asideHover ) return true;
+
+      // make sure the item index exists
+      if( angular.isDefined( collapseList[$index] ) ) {
+        if ( ! $scope.lastEventFromChild ) {
+          collapseList[$index] = !collapseList[$index];
+          closeAllBut($index);
         }
-
+      }
+      else if ( isParentItem ) {
+        closeAllBut(-1);
       }
 
-      this.head = function (path) {
-        return http('HEAD', path === undefined ? '' : path);
-      };
+      $scope.lastEventFromChild = isChild($index);
 
-      this.get = function (path, paginacao) {
-        return http('GET', path === undefined ? '' : path, null, paginacao);
-      };
-      this.post = function (path, data) {
-        return http('POST', path === undefined ? '' : path, data || '');
-      };
-      this.delete = function (path) {
-        return http('DELETE', path === undefined ? '' : path );
-      };
-      this.put = function (path, data) {
-        return http('PUT', path === undefined ? '' : path, data || '');
+      return true;
+
+    };
+
+    function closeAllBut(index) {
+      index += '';
+      for(var i in collapseList) {
+        if(index < 0 || index.indexOf(i) < 0)
+          collapseList[i] = true;
       }
     }
 
-  }]);
+    function isChild($index) {
+      return (typeof $index === 'string') && !($index.indexOf('-') < 0);
+    }
+
+}]);
 
 'use strict';
 
@@ -582,91 +667,6 @@ angular.module('projetoBase')
       }
     };
   }]);
-
-App.controller('SidebarController', ['$rootScope', '$scope', '$state', 'Utils',
-  function($rootScope, $scope, $state, Utils){
-
-    var collapseList = [];
-
-    // demo: when switch from collapse to hover, close all items
-    $rootScope.$watch('app.layout.asideHover', function(oldVal, newVal){
-      if ( newVal === false && oldVal === true) {
-        closeAllBut(-1);
-      }
-    });
-
-    // Check item and children active state
-    var isActive = function(item) {
-
-      if(!item) return;
-
-      if( !item.sref || item.sref == '#') {
-        var foundActive = false;
-        angular.forEach(item.submenu, function(value, key) {
-          if(isActive(value)) foundActive = true;
-        });
-        return foundActive;
-      }
-      else
-        return $state.is(item.sref) || $state.includes(item.sref);
-    };
-
-    $scope.getMenuItemPropClasses = function(item) {
-      return (item.heading ? 'nav-heading' : '') +
-             (isActive(item) ? ' active' : '') ;
-    };
-
-
-    $scope.loadSidebarMenu = function() {
-      menuItems = $state.menuItems;
-     };
-     $scope.loadSidebarMenu();
-
-
-    $scope.addCollapse = function($index, item) {
-      collapseList[$index] = $rootScope.app.layout.asideHover ? true : !isActive(item);
-    };
-
-    $scope.isCollapse = function($index) {
-      return (collapseList[$index]);
-    };
-
-    $scope.toggleCollapse = function($index, isParentItem) {
-
-
-      // collapsed sidebar doesn't toggle drodopwn
-      if( Utils.isSidebarCollapsed() || $rootScope.app.layout.asideHover ) return true;
-
-      // make sure the item index exists
-      if( angular.isDefined( collapseList[$index] ) ) {
-        if ( ! $scope.lastEventFromChild ) {
-          collapseList[$index] = !collapseList[$index];
-          closeAllBut($index);
-        }
-      }
-      else if ( isParentItem ) {
-        closeAllBut(-1);
-      }
-
-      $scope.lastEventFromChild = isChild($index);
-
-      return true;
-
-    };
-
-    function closeAllBut(index) {
-      index += '';
-      for(var i in collapseList) {
-        if(index < 0 || index.indexOf(i) < 0)
-          collapseList[i] = true;
-      }
-    }
-
-    function isChild($index) {
-      return (typeof $index === 'string') && !($index.indexOf('-') < 0);
-    }
-
-}]);
 
 App.directive('dsDate', ['$filter', function($filter) {
   'use strict';
@@ -1064,6 +1064,38 @@ App
 	"total_pages": 1,
 	"num_results": 2
 });
+(function(angular){
+    'user strict'
+  
+    angular
+    .module('projetoBase')
+    .factory('SrvAladin', SrvAladin);
+    
+    function SrvAladin(){
+    
+      return{
+        abrirSkyMapAladin: _abrirSkyMapAladin,
+      };
+  
+      function _abrirSkyMapAladin(posicao){
+            let outHtml = '<link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />'+
+            '<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>'+
+            '<div id="aladin-lite-div" style="width:700px;height:400px;"></div>'+
+            '<script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>'+
+            '<script type="text/javascript">'+
+            '    var aladin = A.aladin("#aladin-lite-div",'+
+            '       {fov: 1.5, reticleSize: 64 }'+
+            '    );'+
+            '    aladin.gotoRaDec('+posicao.ra+', '+posicao.dec+');'+
+            '</script>';       
+              var myWindow = window.open("", "MsgWindow", "width=700,height=400");
+              myWindow.document.write(outHtml);
+      }
+  
+    };
+  
+  })(window.angular);
+  
 /**=========================================================
  * Module: popover.js
  * Utility library to use across the theme
@@ -1197,38 +1229,6 @@ App.service('Utils', ["$window", "APP_MEDIAQUERY", function($window, APP_MEDIAQU
     }
 }]);
 
-(function(angular){
-    'user strict'
-  
-    angular
-    .module('projetoBase')
-    .factory('SrvAladin', SrvAladin);
-    
-    function SrvAladin(){
-    
-      return{
-        abrirSkyMapAladin: _abrirSkyMapAladin,
-      };
-  
-      function _abrirSkyMapAladin(posicao){
-            let outHtml = '<link rel="stylesheet" href="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.css" />'+
-            '<script type="text/javascript" src="https://code.jquery.com/jquery-1.9.1.min.js" charset="utf-8"></script>'+
-            '<div id="aladin-lite-div" style="width:700px;height:400px;"></div>'+
-            '<script type="text/javascript" src="https://aladin.u-strasbg.fr/AladinLite/api/v2/latest/aladin.min.js" charset="utf-8"></script>'+
-            '<script type="text/javascript">'+
-            '    var aladin = A.aladin("#aladin-lite-div",'+
-            '       {fov: 1.5, reticleSize: 64 }'+
-            '    );'+
-            '    aladin.gotoRaDec('+posicao.ra+', '+posicao.dec+');'+
-            '</script>';       
-              var myWindow = window.open("", "MsgWindow", "width=700,height=400");
-              myWindow.document.write(outHtml);
-      }
-  
-    };
-  
-  })(window.angular);
-  
 
 (function(angular) {
   'use strict';
