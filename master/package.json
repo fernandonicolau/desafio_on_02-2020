@@ -1,6 +1,6 @@
 {
   "name": "projetoBase",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Desáfio ON",
   "author": "@themicon_co",
   "devDependencies": {
@@ -39,11 +39,12 @@
   "scripts": {
     "prestart": "bower install --force-latest",
     "start": "npm i",
-    "poststart": "gulp"
+    "poststart": "gulp",
+    "release": "standard-version"
   },
   "engines": {
-   "node": "8.17.0",
-   "npm": "6.13.4"
+    "node": "8.17.0",
+    "npm": "6.13.4"
   },
   "dependencies": {
     "angular-chart.js": "^1.1.1",
