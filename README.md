@@ -17,23 +17,24 @@ PHP - https://www.php.net/
 ### Installing
 
 1. Acessar a pasta "master" a partir do raiz do projeto .
-2. Executar o comando de instalação do npm (npm comand).
+2. Executar o comando de instalação do npm:
+```
+npm install -g bower
+```
+```
+npm install -g gulp
+```
+```
+npm run start
+```
+Obs.: Esse comando executa os comandos:
+```
+1. bower install --force-latest 
+2. npm i
+3. gulp 
+```
 
-3.1 - Executa o comando bower install (dependência do projeto)
-```
-npm prestart
-```
-3.2 - Executa o comando npm install (dependência do projeto)
-```
-npm start
-```
-
-3.3 - Faz o build do projeto. 
-```
-npm poststart
-```
-
-## Built With
+## Build With
 
 * [Gulp](https://gulpjs.com/) - build project
 * [Bower](https://bower.io/) - Dependency Management
