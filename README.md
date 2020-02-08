@@ -34,7 +34,7 @@ Obs.: Esse comando executa os comandos:
 3. gulp 
 ```
 
-## Built With
+## Build With
 
 * [Gulp](https://gulpjs.com/) - build project
 * [Bower](https://bower.io/) - Dependency Management
