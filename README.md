@@ -31,7 +31,7 @@ Obs.: Esse comando executa os comandos:
 ```
 1. bower install --force-latest 
 2. npm i
-1. gulp 
+3. gulp 
 ```
 
 ## Built With
