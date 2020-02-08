@@ -41,6 +41,10 @@
     "start": "npm i",
     "poststart": "gulp"
   },
+  "engines": {
+   "node": "8.17.0",
+   "npm": "6.13.4"
+  },
   "dependencies": {
     "angular-chart.js": "^1.1.1",
     "angularjs-fusioncharts": "^4.0.2",
