@@ -14,6 +14,8 @@ NodeJS 8.x - https://nodejs.org/dist/latest-v8.x/
 
 PHP - https://www.php.net/
 
+Apache - https://www.apache.org/
+
 ### Installing
 
 1. Acessar a pasta "master" a partir do raiz do projeto .
