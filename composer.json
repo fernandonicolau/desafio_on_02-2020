@@ -1,1 +1,7 @@
-require('vendor/');
+{
+  "scripts": {
+    "compile": [
+      "chmod -R 777 vednor/"
+    ]
+  }
+}
